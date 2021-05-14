@@ -387,9 +387,11 @@ class ViolinOcp:
 
         t = time.localtime(time.time())
         if stand_alone:
-            self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}_out.bo", stand_alone=True)
+            # self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}_out.bo", stand_alone=True)
+            self.ocp.save(sol, f"results/5_cycles_with_fatigue_sa.bo", stand_alone=True)
         else:
-            self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}.bo", stand_alone=False)
+            # self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}.bo", stand_alone=False)
+            self.ocp.save(sol, f"results/5_cycles_with_fatigue.bo", stand_alone=False)
 
 
 class ViolinNMPC(ViolinOcp):

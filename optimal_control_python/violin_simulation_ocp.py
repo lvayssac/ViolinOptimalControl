@@ -1,4 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import pickle
+from scipy.integrate import solve_ivp
+from bioptim import OptimalControlProgram
 
 from violin_ocp import Violin, ViolinString, ViolinOcp, Bow, BowTrajectory, BowPosition
 from bioptim import Solver
@@ -37,12 +41,89 @@ if __name__ == "__main__":
     bow_target = np.concatenate((bow_target, bow_trajectory.target[:, -1][:, np.newaxis]), axis=1)
     ocp.set_bow_target_objective(bow_target)
 
+    from time import time
+    t = time()
     sol = ocp.solve(
         show_online_optim=True,
         solver_options={"max_iter": 1000, "hessian_approximation": "limited-memory", "linear_solver": "ma57"},
     )
-    ocp.save(sol)
-    ocp.save(sol, stand_alone=True)
-
+    t2 = time() - t
     sol.print()
     sol.animate(show_meshes=False)
+
+    # Save results without stand alone
+    ocp.save(sol, False)
+    ocp_load, sol_load = OptimalControlProgram.load("results/5_cycles_with_fatigue.bo")
+    #sol_load.animate()
+    sol_load.graphs()
+
+    # Save results with stand alone
+    ocp.save(sol, True)
+    with open(f"results/5_cycles_with_fatigue_sa.bo", "rb") as file:
+        states, controls, parameters = pickle.load(file)
+
+    # Print time to optimize
+    from time import time
+    print(f"Graphing time = {t2 - sol.time_to_optimize}")
+    print(f"Graphing time = {sol.time_to_optimize}")
+
+    # Print humerus_right_rot_z
+    q_humerus_right_rot_z = states['q'][6]
+    qdot_humerus_right_rot_z = states['qdot'][6]
+    tau_neg_humerus_right_rot_z = controls['tau'][6]
+    tau_pos_humerus_right_rot_z = controls['tau'][19]
+    ma_neg_humerus_right_rot_z = states['fatigue'][37]
+    mr_neg_humerus_right_rot_z = states['fatigue'][38]
+    mf_neg_humerus_right_rot_z = states['fatigue'][39]
+    ma_pos_humerus_right_rot_z = states['fatigue'][40]
+    mr_pos_humerus_right_rot_z = states['fatigue'][41]
+    mf_pos_humerus_right_rot_z = states['fatigue'][42]
+
+    x = np.array([i for i in range(0, 31)])
+
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.plot(x, q_humerus_right_rot_z)
+    plt.title("q_humerus_right_rot_z")
+
+    plt.figure()
+    plt.plot(x, qdot_humerus_right_rot_z)
+    plt.title("qdot_humerus_right_rot_z")
+
+    plt.figure()
+    plt.plot(x, tau_pos_humerus_right_rot_z)
+    plt.plot(x, -tau_neg_humerus_right_rot_z)
+    plt.title("tau_humerus_right_rot_z")
+
+    plt.figure()
+    plt.plot(x, ma_pos_humerus_right_rot_z)
+    plt.plot(x, mr_pos_humerus_right_rot_z)
+    plt.plot(x, mf_pos_humerus_right_rot_z)
+    plt.plot(x, -ma_neg_humerus_right_rot_z)
+    plt.plot(x, -mr_neg_humerus_right_rot_z)
+    plt.plot(x, -mf_neg_humerus_right_rot_z)
+    plt.title("fatigue_humerus_right_rot_z")
+
+    plt.plot()
+
+    # Root mean square
+    from scipy import integrate as intg
+
+    q_humerus_right_rot_z = states['q'][6]
+    qdot_humerus_right_rot_z = states['qdot'][6]
+    x = np.array([i for i in range(0, 31)])
+
+    I1 = intg.trapz(q_humerus_right_rot_z, x)
+    I2 = intg.trapz(qdot_humerus_right_rot_z, x)
+
+    sub_I = []
+    for i in range(0, 31):
+        sub_I.append((I1[i] - I2[i])*(I1[i] - I2[i]))
+
+    from statistics import mean
+    mean = mean(sub_I)
+
+    from math import sqrt
+    reqm = sqrt(mean)
+
+    print(reqm)
