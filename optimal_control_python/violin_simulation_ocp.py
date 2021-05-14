@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pickle
-from scipy.integrate import solve_ivp
 from bioptim import OptimalControlProgram
 
 from violin_ocp import Violin, ViolinString, ViolinOcp, Bow, BowTrajectory, BowPosition
@@ -68,6 +66,8 @@ if __name__ == "__main__":
     print(f"Graphing time = {sol.time_to_optimize}")
 
     # Print results for humerus_right_rot_z
+    import matplotlib.pyplot as plt
+
     q_humerus_right_rot_z = states['q'][6]
     qdot_humerus_right_rot_z = states['qdot'][6]
     tau_neg_humerus_right_rot_z = controls['tau'][6]
@@ -81,7 +81,6 @@ if __name__ == "__main__":
 
     x = np.array([i for i in range(0, 31)])
 
-    import matplotlib.pyplot as plt
     plt.figure()
     plt.plot(x, q_humerus_right_rot_z)
     plt.title("q_humerus_right_rot_z")
