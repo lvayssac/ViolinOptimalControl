@@ -67,7 +67,7 @@ if __name__ == "__main__":
     print(f"Graphing time = {t2 - sol.time_to_optimize}")
     print(f"Graphing time = {sol.time_to_optimize}")
 
-    # Print humerus_right_rot_z
+    # Print results for humerus_right_rot_z
     q_humerus_right_rot_z = states['q'][6]
     qdot_humerus_right_rot_z = states['qdot'][6]
     tau_neg_humerus_right_rot_z = controls['tau'][6]
@@ -92,38 +92,39 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(x, tau_pos_humerus_right_rot_z)
-    plt.plot(x, -tau_neg_humerus_right_rot_z)
+    plt.plot(x, tau_neg_humerus_right_rot_z)
     plt.title("tau_humerus_right_rot_z")
 
     plt.figure()
-    plt.plot(x, ma_pos_humerus_right_rot_z)
-    plt.plot(x, mr_pos_humerus_right_rot_z)
-    plt.plot(x, mf_pos_humerus_right_rot_z)
-    plt.plot(x, -ma_neg_humerus_right_rot_z)
-    plt.plot(x, -mr_neg_humerus_right_rot_z)
-    plt.plot(x, -mf_neg_humerus_right_rot_z)
+    plt.plot(x, ma_pos_humerus_right_rot_z, color='green')
+    plt.plot(x, mr_pos_humerus_right_rot_z, color='red')
+    plt.plot(x, -mf_pos_humerus_right_rot_z, color='blue')
+    plt.plot(x, -ma_neg_humerus_right_rot_z, color='green')
+    plt.plot(x, -mr_neg_humerus_right_rot_z, color='red')
+    plt.plot(x, mf_neg_humerus_right_rot_z, color='blue')
     plt.title("fatigue_humerus_right_rot_z")
 
     plt.plot()
 
-    # Root mean square
+    # Root mean square (or use scikit-learn rmse ?)
     from scipy import integrate as intg
+    from statistics import mean
+    from math import sqrt
 
     q_humerus_right_rot_z = states['q'][6]
     qdot_humerus_right_rot_z = states['qdot'][6]
-    x = np.array([i for i in range(0, 31)])
 
-    I1 = intg.trapz(q_humerus_right_rot_z, x)
-    I2 = intg.trapz(qdot_humerus_right_rot_z, x)
+    def rmse(list1: list, list2: list):
+        from statistics import mean
+        len_list = len(list1)
+        x = np.array([i for i in range(0, len_list)])
+        I1 = intg.trapz(list1, x)
+        I2 = intg.trapz(list2, x)
+        sub_I = []
+        for i in range(0, len_list):
+            sub_I.append((I1[i] - I2[i]) * (I1[i] - I2[i]))
+        mean = mean(sub_I)
+        rmse = sqrt(mean)
+        return rmse
 
-    sub_I = []
-    for i in range(0, 31):
-        sub_I.append((I1[i] - I2[i])*(I1[i] - I2[i]))
-
-    from statistics import mean
-    mean = mean(sub_I)
-
-    from math import sqrt
-    reqm = sqrt(mean)
-
-    print(reqm)
+    rmse = rmse(q_humerus_right_rot_z, qdot_humerus_right_rot_z)
