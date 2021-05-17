@@ -121,7 +121,8 @@ class ViolinOcp:
     def _set_generic_objective_functions(self):
         # Regularization objectives
         self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_STATE, weight=0.01, list_index=0)
-        self.objective_functions.add(self.minimize_fatigue, custom_type=ObjectiveFcn.Lagrange, weight=10, list_index=1)
+        if self.fatigable:
+            self.objective_functions.add(self.minimize_fatigue, custom_type=ObjectiveFcn.Lagrange, weight=10, list_index=1)
 
         if self.use_muscles:
             self.objective_functions.add(
@@ -249,8 +250,9 @@ class ViolinOcp:
         return self.ocp.solve(solver=self.solver, **opts)
 
     @staticmethod
-    def fatigue_dynamics(states: Union[MX, SX], controls: Union[MX, SX], parameters: Union[MX, SX], nlp: NonLinearProgram
-                       ) -> tuple:
+    def fatigue_dynamics(
+            states: Union[MX, SX], controls: Union[MX, SX], parameters: Union[MX, SX], nlp: NonLinearProgram
+    ) -> tuple:
 
         DynamicsFunctions.apply_parameters(parameters, nlp)
         q, qdot = DynamicsFunctions.dispatch_q_qdot_data(states, controls, nlp)
@@ -289,10 +291,11 @@ class ViolinOcp:
             TL_pos = tau[i + n_tau] / tau_bounds[1][i]
             fatigue_dot.append(fatigue_dot_func(TL_pos, fatigue[i][n_fatigue_param:]))
 
-            ma_neg, ma_pos = fatigue[i][0], fatigue[i][n_fatigue_param]
-            tau_current.append(ma_neg * tau_bounds[0][i] + ma_pos * tau_bounds[1][i])
+            # ma_neg, ma_pos = fatigue[i][0], fatigue[i][n_fatigue_param]
+            # tau_current.append(ma_neg * tau_bounds[0][i] + ma_pos * tau_bounds[1][i])
 
-        qddot = nlp.model.ForwardDynamics(q, qdot, vertcat(*tau_current)).to_mx()
+        # qddot = nlp.model.ForwardDynamics(q, qdot, vertcat(*tau_current)).to_mx()
+        qddot = nlp.model.ForwardDynamics(q, qdot, tau[:n_tau] + tau[n_tau:]).to_mx()
 
         return qdot, qddot, vertcat(*fatigue_dot)
 
@@ -388,10 +391,10 @@ class ViolinOcp:
         t = time.localtime(time.time())
         if stand_alone:
             # self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}_out.bo", stand_alone=True)
-            self.ocp.save(sol, f"results/5_cycles_with_fatigue_sa.bo", stand_alone=True)
+            self.ocp.save(sol, f"results/5_cycles_without_fatigue_sa.bo", stand_alone=True)
         else:
             # self.ocp.save(sol, f"results/{t.tm_year}_{t.tm_mon}_{t.tm_mday}.bo", stand_alone=False)
-            self.ocp.save(sol, f"results/5_cycles_with_fatigue.bo", stand_alone=False)
+            self.ocp.save(sol, f"results/5_cycles_without_fatigue.bo", stand_alone=False)
 
 
 class ViolinNMPC(ViolinOcp):

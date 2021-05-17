@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # --- Solve the program --- #
     n_shoot_per_cycle = 30
     cycle_time = 1
-    n_cycles = 1
+    n_cycles = 5
     solver = Solver.IPOPT
     n_threads = 2
     ocp = ViolinOcp(
@@ -46,18 +46,16 @@ if __name__ == "__main__":
         solver_options={"max_iter": 1000, "hessian_approximation": "limited-memory", "linear_solver": "ma57"},
     )
     t2 = time() - t
-    sol.print()
-    sol.animate(show_meshes=False)
 
     # Save results without stand alone
     ocp.save(sol, False)
-    ocp_load, sol_load = OptimalControlProgram.load("results/5_cycles_with_fatigue.bo")
+    ocp_load, sol_load = OptimalControlProgram.load("5_cycles_without_fatigue.bo")
     #sol_load.animate()
     sol_load.graphs()
 
     # Save results with stand alone
     ocp.save(sol, True)
-    with open(f"results/5_cycles_with_fatigue_sa.bo", "rb") as file:
+    with open(f"results/5_cycles_without_fatigue_sa.bo", "rb") as file:
         states, controls, parameters = pickle.load(file)
 
     # Print time to optimize
@@ -65,65 +63,67 @@ if __name__ == "__main__":
     print(f"Graphing time = {t2 - sol.time_to_optimize}")
     print(f"Graphing time = {sol.time_to_optimize}")
 
-    # Print results for humerus_right_rot_z
-    import matplotlib.pyplot as plt
+    sol.print()
+    sol.animate(show_meshes=False)
 
-    q_humerus_right_rot_z = states['q'][6]
-    qdot_humerus_right_rot_z = states['qdot'][6]
-    tau_neg_humerus_right_rot_z = controls['tau'][6]
-    tau_pos_humerus_right_rot_z = controls['tau'][19]
-    ma_neg_humerus_right_rot_z = states['fatigue'][37]
-    mr_neg_humerus_right_rot_z = states['fatigue'][38]
-    mf_neg_humerus_right_rot_z = states['fatigue'][39]
-    ma_pos_humerus_right_rot_z = states['fatigue'][40]
-    mr_pos_humerus_right_rot_z = states['fatigue'][41]
-    mf_pos_humerus_right_rot_z = states['fatigue'][42]
-
-    x = np.array([i for i in range(0, 31)])
-
-    plt.figure()
-    plt.plot(x, q_humerus_right_rot_z)
-    plt.title("q_humerus_right_rot_z")
-
-    plt.figure()
-    plt.plot(x, qdot_humerus_right_rot_z)
-    plt.title("qdot_humerus_right_rot_z")
-
-    plt.figure()
-    plt.plot(x, tau_pos_humerus_right_rot_z)
-    plt.plot(x, tau_neg_humerus_right_rot_z)
-    plt.title("tau_humerus_right_rot_z")
-
-    plt.figure()
-    plt.plot(x, ma_pos_humerus_right_rot_z, color='green')
-    plt.plot(x, mr_pos_humerus_right_rot_z, color='red')
-    plt.plot(x, -mf_pos_humerus_right_rot_z, color='blue')
-    plt.plot(x, -ma_neg_humerus_right_rot_z, color='green')
-    plt.plot(x, -mr_neg_humerus_right_rot_z, color='red')
-    plt.plot(x, mf_neg_humerus_right_rot_z, color='blue')
-    plt.title("fatigue_humerus_right_rot_z")
-
-    plt.plot()
-
-    # Root mean square (or use scikit-learn rmse ?)
-    from scipy import integrate as intg
-    from statistics import mean
-    from math import sqrt
-
-    q_humerus_right_rot_z = states['q'][6]
-    qdot_humerus_right_rot_z = states['qdot'][6]
-
-    def rmse(list1: list, list2: list):
-        from statistics import mean
-        len_list = len(list1)
-        x = np.array([i for i in range(0, len_list)])
-        I1 = intg.trapz(list1, x)
-        I2 = intg.trapz(list2, x)
-        sub_I = []
-        for i in range(0, len_list):
-            sub_I.append((I1[i] - I2[i]) * (I1[i] - I2[i]))
-        mean = mean(sub_I)
-        rmse = sqrt(mean)
-        return rmse
-
-    rmse = rmse(q_humerus_right_rot_z, qdot_humerus_right_rot_z)
+    # # Print results for humerus_right_rot_z
+    # import matplotlib.pyplot as plt
+    #
+    # q_humerus_right_rot_z = states['q'][6]
+    # qdot_humerus_right_rot_z = states['qdot'][6]
+    # tau_neg_humerus_right_rot_z = controls['tau'][6]
+    # tau_pos_humerus_right_rot_z = controls['tau'][19]
+    # ma_neg_humerus_right_rot_z = states['fatigue'][37]
+    # mr_neg_humerus_right_rot_z = states['fatigue'][38]
+    # mf_neg_humerus_right_rot_z = states['fatigue'][39]
+    # ma_pos_humerus_right_rot_z = states['fatigue'][40]
+    # mr_pos_humerus_right_rot_z = states['fatigue'][41]
+    # mf_pos_humerus_right_rot_z = states['fatigue'][42]
+    #
+    # x = np.array([i for i in range(0, 31)])
+    #
+    # plt.figure()
+    # plt.plot(x, q_humerus_right_rot_z)
+    # plt.title("q_humerus_right_rot_z")
+    #
+    # plt.figure()
+    # plt.plot(x, qdot_humerus_right_rot_z)
+    # plt.title("qdot_humerus_right_rot_z")
+    #
+    # plt.figure()
+    # plt.plot(x, tau_pos_humerus_right_rot_z)
+    # plt.plot(x, tau_neg_humerus_right_rot_z)
+    # plt.title("tau_humerus_right_rot_z")
+    #
+    # plt.figure()
+    # plt.plot(x, ma_pos_humerus_right_rot_z, color='green')
+    # plt.plot(x, mr_pos_humerus_right_rot_z, color='red')
+    # plt.plot(x, -mf_pos_humerus_right_rot_z, color='blue')
+    # plt.plot(x, -ma_neg_humerus_right_rot_z, color='green')
+    # plt.plot(x, -mr_neg_humerus_right_rot_z, color='red')
+    # plt.plot(x, mf_neg_humerus_right_rot_z, color='blue')
+    # plt.title("fatigue_humerus_right_rot_z")
+    #
+    # plt.plot()
+    #
+    # # Root mean square (or use scikit-learn rmse ?)
+    # from scipy import integrate as intg
+    # from statistics import mean
+    # from math import sqrt
+    #
+    # q_humerus_right_rot_z = states['q'][6]
+    # qdot_humerus_right_rot_z = states['qdot'][6]
+    #
+    # def rmse(list1: list, list2: list):
+    #     from statistics import mean
+    #     len_list = len(list1)
+    #     x = np.array([i for i in range(0, len_list)])
+    #     I1 = intg.trapz(list1, x)
+    #     I2 = intg.trapz(list2, x)
+    #     sub_I = []
+    #     for i in range(0, len_list):
+    #         sub_I.append((I1[i] - I2[i]) * (I1[i] - I2[i]))
+    #     mean = mean(sub_I)
+    #     return sqrt(mean)
+    #
+    # rmse = rmse(q_humerus_right_rot_z, qdot_humerus_right_rot_z)

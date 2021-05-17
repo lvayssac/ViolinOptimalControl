@@ -23,12 +23,12 @@ segment thorax
         1.4745	0.000000	0.000000
         0.000000	0.7555	0.000000
         0.000000	0.000000	1.4314
-    // meshfile Geometry/thorax.vtp
+    meshfile Geometry/thorax.vtp
 endsegment
 
 segment spine
 	parent	thorax
-    // meshfile Geometry/hat_spine.vtp
+    meshfile Geometry/hat_spine.vtp
 endsegment
 
 segment clavicle_effector_right
@@ -186,7 +186,7 @@ segment bow
 		0.000000	0.00000048	0.000000
 		0.000000	0.000000	0.00117637
 	com	0 -0.335 0
-	// meshfile Geometry/Bow.obj
+	meshfile Geometry/Bow.obj
 endsegment
 segment bow_hair
     parent bow
@@ -230,7 +230,7 @@ segment clavicle_left
         0                   0                    0                   1
     mass 0.2
     com -0.0127205 0.00849541 -0.0659846
-    // meshfile Geometry/clavicle_left.vtp
+    meshfile Geometry/clavicle_left.vtp
 endsegment
 
 
@@ -244,7 +244,7 @@ segment scapula_left
     RT -0.52 0.52 0 xyz 0 0 0
     mass 0.5
     com -0.072 -0.039 0.065
-    // meshfile Geometry/scapula_left.vtp
+    meshfile Geometry/scapula_left.vtp
 endsegment
 
 
@@ -263,7 +263,7 @@ segment humerus_rotation_left
     // This segment is created so one can choose if the dof exists or not
     // rotations yzy
     RT 0.25 0.8 0 yzy 0 0 0
-    // meshfile Geometry/humerus_left.vtp
+    meshfile Geometry/humerus_left.vtp
 endsegment
 
 
@@ -296,7 +296,7 @@ segment ulna_left
         0.002962 0 0
         0 0.000618 0
         0 0 0.003213
-    // meshfile Geometry/ulna_left.vtp
+    meshfile Geometry/ulna_left.vtp
 endsegment
 
 
@@ -329,7 +329,7 @@ segment radius_left
         0.002962 0 0
         0 0.000618 0
         0 0 0.003213
-    // meshfile Geometry/radius_left.vtp
+    meshfile Geometry/radius_left.vtp
 endsegment
 
 
@@ -356,7 +356,7 @@ segment violin
 	    0.000000	0.00000048	0.000000
 	    0.000000	0.000000	0.00117637
     com	-0.003 -0.325 0
-    // meshfile Geometry/Violin.obj
+    meshfile Geometry/Violin.obj
 endsegment
 
 
