@@ -277,8 +277,8 @@ class ViolinOcp:
             mf = param[2]
             c = if_else(lt(ma, TL), if_else(gt(mr, TL - ma), LD * (TL - ma), LD * mr), LR * (TL - ma))
             madot = c - F * ma
-            mrdot = -c + R * mf + 100 * (1 - (ma + mr + mf))
-            mfdot = F * ma - R * mf
+            mrdot = -c + R * mf
+            mfdot = F * ma - R * mf + 100 * (1 - (ma + mr + mf))
             return vertcat(madot, mrdot, mfdot)
 
         fatigue_dot = []
