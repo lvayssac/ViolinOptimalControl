@@ -132,18 +132,28 @@ class ViolinOcp:
                 list_index=2
             )
             self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_MUSCLES_CONTROL, weight=10, list_index=3)
+            self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_QDDOT, weight=0.01, list_index=4)
+
+            # Keep the bow align at 90 degrees with the violin
+            self.objective_functions.add(
+                ObjectiveFcn.Lagrange.TRACK_SEGMENT_WITH_CUSTOM_RT,
+                weight=1000,
+                segment=self.bow.segment_idx,
+                rt_idx=self.violin.rt_on_string,
+                list_index=5
+            )
         else:
             self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_TORQUE, weight=0.01, list_index=2)
-        self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_QDDOT, weight=0.01, list_index=4)
+            self.objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_QDDOT, weight=0.01, list_index=3)
 
-        # Keep the bow align at 90 degrees with the violin
-        self.objective_functions.add(
-            ObjectiveFcn.Lagrange.TRACK_SEGMENT_WITH_CUSTOM_RT,
-            weight=1000,
-            segment=self.bow.segment_idx,
-            rt_idx=self.violin.rt_on_string,
-            list_index=5
-        )
+            # Keep the bow align at 90 degrees with the violin
+            self.objective_functions.add(
+                ObjectiveFcn.Lagrange.TRACK_SEGMENT_WITH_CUSTOM_RT,
+                weight=1000,
+                segment=self.bow.segment_idx,
+                rt_idx=self.violin.rt_on_string,
+                list_index=4
+            )
 
     def _set_generic_constraints(self):
         # Keep the bow in contact with the violin
